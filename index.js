@@ -64,6 +64,18 @@ async function run() {
             res.send(result)
         })
 
+
+        // specific user
+        app.get('/added-toys', async (req, res) => {
+            console.log(req.query?.email)
+            let query = {};
+            if (req.query?.email) {
+                query = { email: req.query?.email }
+            }
+            const result = await addToy.find(query).toArray()
+            res.send(result)
+        })
+
         app.post('/added-toys', async (req, res) => {
             const added = req.body;
             const result = await addToy.insertOne(added)
