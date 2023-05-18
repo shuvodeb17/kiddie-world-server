@@ -1,4 +1,4 @@
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const express = require('express')
 require('dotenv').config()
 const cors = require('cors');
@@ -31,7 +31,6 @@ async function run() {
         const allToys = client.db('kiddieWorld').collection('allToys')
 
         app.get('/all-toys/:category', async (req, res) => {
-            console.log(req.params.category)
             if (req.params.category == 'Sports Car' || req.params.category == 'Tractor' || req.params.category == 'Fire') {
                 const cursor = allToys.find({ subCategory: req.params.category })
                 const result = await cursor.toArray()
@@ -44,6 +43,21 @@ async function run() {
             }
         })
 
+        app.get('/all-toys', async (req, res) => {
+            const cursor = allToys.find({})
+            const result = await cursor.toArray()
+            res.send(result)
+        })
+
+        app.get('/toy/:id', async(req,res)=>{
+            const id = req.params.id
+            const query = {_id: new ObjectId(id)}
+            const result = await allToys.findOne(query);
+            res.send(result)
+        })
+
+
+        
 
         // Send a ping to confirm a successful connection
         await client.db("admin").command({ ping: 1 });
