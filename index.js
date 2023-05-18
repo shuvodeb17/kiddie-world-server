@@ -30,10 +30,18 @@ async function run() {
 
         const allToys = client.db('kiddieWorld').collection('allToys')
 
-        app.get('/all-toys', async (req, res) => {
-            const cursor = allToys.find()
-            const result = await cursor.toArray()
-            res.send(result)
+        app.get('/all-toys/:category', async (req, res) => {
+            console.log(req.params.category)
+            if (req.params.category == 'Sports Car' || req.params.category == 'Tractor' || req.params.category == 'Fire') {
+                const cursor = allToys.find({ subCategory: req.params.category })
+                const result = await cursor.toArray()
+                res.send(result)
+            }
+            else if (req.params.category == 'all') {
+                const cursor = allToys.find({})
+                const result = await cursor.toArray()
+                res.send(result)
+            }
         })
 
 
