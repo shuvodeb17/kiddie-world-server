@@ -29,6 +29,7 @@ async function run() {
         await client.connect();
 
         const allToys = client.db('kiddieWorld').collection('allToys')
+        const addToy = client.db('kiddieWorld').collection('addToy')
 
         app.get('/all-toys/:category', async (req, res) => {
             if (req.params.category == 'Sports Car' || req.params.category == 'Tractor' || req.params.category == 'Fire') {
@@ -49,15 +50,25 @@ async function run() {
             res.send(result)
         })
 
-        app.get('/toy/:id', async(req,res)=>{
+        app.get('/toy/:id', async (req, res) => {
             const id = req.params.id
-            const query = {_id: new ObjectId(id)}
+            const query = { _id: new ObjectId(id) }
             const result = await allToys.findOne(query);
             res.send(result)
         })
 
 
-        
+        app.post('/all-toys-insert', async (req, res) => {
+            const data = req.body;
+            const result = await allToys.insertOne(data)
+            res.send(result)
+        })
+
+        app.post('/added-toys', async (req, res) => {
+            const added = req.body;
+            const result = await addToy.insertOne(added)
+            res.send(result)
+        })
 
         // Send a ping to confirm a successful connection
         await client.db("admin").command({ ping: 1 });
