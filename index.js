@@ -31,6 +31,24 @@ async function run() {
         const allToys = client.db('kiddieWorld').collection('allToys')
         const addToy = client.db('kiddieWorld').collection('addToy')
 
+
+        const indexKeys = { title: 1, category: 1 }
+        const indexOptions = { name: "titleCategory" }
+        const result = await allToys.createIndex(indexKeys, indexOptions)
+
+        app.get('/search-toys/:text', async (req, res) => {
+            const searchText = req.params.text;
+            console.log(searchText);
+            const result = await allToys.find({
+                $or: [
+                    { name: { $regex: searchText, $options: "i" } },
+                    { subCategory: { $regex: searchText, $options: "i" } }
+                ],
+            }).toArray()
+            res.send(result)
+        })
+
+
         app.get('/all-toys/:category', async (req, res) => {
             if (req.params.category == 'Sports Car' || req.params.category == 'Tractor' || req.params.category == 'Fire') {
                 const cursor = allToys.find({ subCategory: req.params.category })
@@ -98,6 +116,14 @@ async function run() {
             res.send(result)
         })
 
+        // delete
+        app.delete('/toyRemove/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) }
+            const result = await addToy.deleteOne(query)
+            res.send(result)
+        })
+
         // single toy 
         app.get('/toySingle/:id', async (req, res) => {
             const id = req.params.id;
@@ -109,7 +135,7 @@ async function run() {
 
         // Send a ping to confirm a successful connection
         await client.db("admin").command({ ping: 1 });
-        console.log("Pinged your deployment. You successfully connected to MongoDB!");
+        console.log("database connected");
     } finally {
         // Ensures that the client will close when you finish/error
         // await client.close();
