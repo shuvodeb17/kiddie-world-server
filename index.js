@@ -53,7 +53,7 @@ async function run() {
         app.get('/toy/:id', async (req, res) => {
             const id = req.params.id
             const query = { _id: new ObjectId(id) }
-            const result = await allToys.findOne(query);
+            const result = await allToys.findOne(query)
             res.send(result)
         })
 
@@ -67,7 +67,7 @@ async function run() {
 
         // specific user
         app.get('/added-toys', async (req, res) => {
-            console.log(req.query?.email)
+            // console.log(req.query?.email)
             let query = {};
             if (req.query?.email) {
                 query = { email: req.query?.email }
@@ -81,6 +81,31 @@ async function run() {
             const result = await addToy.insertOne(added)
             res.send(result)
         })
+
+
+        // update
+        app.patch('/update/:id', async (req, res) => {
+            const id = req.params.id;
+            const data = req.body;
+            const filter = { _id: new ObjectId(id) }
+            const options = { upsert: true };
+            const updatedDoc = {
+                $set: {
+                    ...data
+                }
+            }
+            const result = await addToy.updateOne(filter, updatedDoc, options)
+            res.send(result)
+        })
+
+        // single toy 
+        app.get('/toySingle/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) }
+            const result = await addToy.findOne(query)
+            res.send(result)
+        })
+
 
         // Send a ping to confirm a successful connection
         await client.db("admin").command({ ping: 1 });
