@@ -26,22 +26,23 @@ const client = new MongoClient(uri, {
 async function run() {
     try {
         // Connect the client to the server	(optional starting in v4.7)
-        await client.connect();
+        // await client.connect();
+        client.connect();
 
         const allToys = client.db('kiddieWorld').collection('allToys')
         const addToy = client.db('kiddieWorld').collection('addToy')
 
 
-        const indexKeys = { title: 1, category: 1 }
+        /* const indexKeys = { title: 1, category: 1 }
         const indexOptions = { name: "titleCategory" }
-        const result = await allToys.createIndex(indexKeys, indexOptions)
+        const result = await allToys.createIndex(indexKeys, indexOptions) */
 
         app.get('/search-toys/:text', async (req, res) => {
             const searchText = req.params.text;
-            console.log(searchText);
+            console.log(searchText)
             const result = await allToys.find({
                 $or: [
-                    { name: { $regex: searchText, $options: "i" } },
+                    { toyName: { $regex: searchText, $options: "i" } },
                     { subCategory: { $regex: searchText, $options: "i" } }
                 ],
             }).toArray()
@@ -131,7 +132,6 @@ async function run() {
             const result = await addToy.findOne(query)
             res.send(result)
         })
-
 
         // Send a ping to confirm a successful connection
         await client.db("admin").command({ ping: 1 });
