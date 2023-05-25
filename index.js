@@ -29,7 +29,6 @@ async function run() {
         // await client.connect();
         client.connect();
 
-        const allToys = client.db('kiddieWorld').collection('allToys')
         const addToy = client.db('kiddieWorld').collection('addToy')
 
 
@@ -40,7 +39,7 @@ async function run() {
         app.get('/search-toys/:text', async (req, res) => {
             const searchText = req.params.text;
             console.log(searchText)
-            const result = await allToys.find({
+            const result = await addToy.find({
                 $or: [
                     { toyName: { $regex: searchText, $options: "i" } },
                     { subCategory: { $regex: searchText, $options: "i" } }
@@ -52,19 +51,19 @@ async function run() {
 
         app.get('/all-toys/:category', async (req, res) => {
             if (req.params.category == 'Sports Car' || req.params.category == 'Tractor' || req.params.category == 'Fire') {
-                const cursor = allToys.find({ subCategory: req.params.category })
+                const cursor = addToy.find({ subCategory: req.params.category })
                 const result = await cursor.toArray()
                 res.send(result)
             }
             else if (req.params.category == 'all') {
-                const cursor = allToys.find({})
+                const cursor = addToy.find({})
                 const result = await cursor.toArray()
                 res.send(result)
             }
         })
 
         app.get('/all-toys', async (req, res) => {
-            const cursor = allToys.find({})
+            const cursor = addToy.find({})
             const result = await cursor.toArray()
             res.send(result)
         })
@@ -72,14 +71,14 @@ async function run() {
         app.get('/toy/:id', async (req, res) => {
             const id = req.params.id
             const query = { _id: new ObjectId(id) }
-            const result = await allToys.findOne(query)
+            const result = await addToy.findOne(query)
             res.send(result)
         })
 
 
         app.post('/all-toys-insert', async (req, res) => {
             const data = req.body;
-            const result = await allToys.insertOne(data)
+            const result = await addToy.insertOne(data)
             res.send(result)
         })
 
